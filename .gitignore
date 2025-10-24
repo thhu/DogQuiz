@@ -1,0 +1,113 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+### Android ###
+# Built application files
+*.apk
+*.aab
+*.ap_
+*.a.out
+*.so
+
+# Files for the Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Build folders
+/build/
+/app/build/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Local configuration files (important to exclude)
+/local.properties
+.gradle/
+captures/
+.DS_Store
+
+# Log files
+*.log
+
+# Android Studio generated files and folders
+.idea/
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+*.iws
+*.iml
+*.ipr
+
+# Gradle files
+/gradlew
+/gradlew.bat
+/gradle/wrapper/gradle-wrapper.jar
+!/gradle/wrapper/gradle-wrapper.properties
+
+# Google Services file (if you have a private one not meant for public repo)
+# google-services.json
+
+# Signed bundle and APK files
+*.aab
+*.apk
+app-release.aab
+app-release.apk
+
+# Unsigned APK files
+app-debug.apk
+app-debug-unaligned.apk
+
+# KSP and KAPT generated files
+/app/build/generated/
+
+### JetBrains ###
+# Covers IDEs like IntelliJ IDEA and Android Studio
+.idea/
+*.iws
+*.iml
+*.ipr
+/out/
+/target/
+
+# Local history files
+.idea/sonarlint/
+.idea/shelf/
+
+### Kotlin ###
+# Compiled class files and JARs
+*.class
+*.jar
+
+# Package files
+*.kdoc
+
+# Log files
+*.log
+
+# Build directory
+/build/
+
+# Other temporary files
+*.swp
+*~
+*.bak
+
