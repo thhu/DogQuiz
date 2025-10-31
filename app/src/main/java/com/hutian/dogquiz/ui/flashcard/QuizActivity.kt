@@ -36,14 +36,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.hutian.dogquiz.domain.flashcard.viewmodels.Card
 import com.hutian.dogquiz.domain.flashcard.viewmodels.DogFlashCard
 import com.hutian.dogquiz.domain.flashcard.viewmodels.FlashCardViewModel
 import com.hutian.dogquiz.ui.theme.DogQuizTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class QuizActivity : ComponentActivity() {
@@ -68,28 +68,11 @@ fun FlashCardScreen(modifier: Modifier = Modifier) {
     // Get an instance of the ViewModel using Hilt
     val viewModel: FlashCardViewModel = hiltViewModel()
 
-    // State for the current dog being displayed
-    var currentCard by remember { mutableStateOf<Card?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
-
-    var userGuess by remember { mutableStateOf("") }
-    var feedbackMessage by remember { mutableStateOf<String?>(null) }
-    var showAnswer by remember { mutableStateOf(false) }
-
-    val loadNextCard = {
-        scope.launch {
-            isLoading = true
-            userGuess = "" // Clear previous guess
-            feedbackMessage = null // Clear previous feedback
-            showAnswer = false
-            currentCard = viewModel.getRandomCard()
-            isLoading = false
-        }
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     // Effect to load the first dog when the screen appears
     LaunchedEffect(Unit) {
-        loadNextCard()
+        viewModel.loadNextCard()
     }
 
     // Main layout for the screen
@@ -98,18 +81,18 @@ fun FlashCardScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (isLoading) {
+        if (uiState.isLoading) {
             CircularProgressIndicator()
         } else {
             // Display the flashcard if a dog has been loaded
-            currentCard?.let { card ->
-                FlashCard(card = card, flipped = showAnswer)
+            uiState.currentCard?.let { card ->
+                FlashCard(card = card, flipped = uiState.showAnswer)
             }
         }
 
         Spacer(Modifier.height(24.dp))
 
-        feedbackMessage?.let { message ->
+        uiState.feedbackMessage?.let { message ->
             Text(
                 text = message,
                 color = if (message == "Correct!") Color.Green else Color.Red,
@@ -119,34 +102,20 @@ fun FlashCardScreen(modifier: Modifier = Modifier) {
         }
 
         TextField(
-            value = userGuess,
-            onValueChange = { userGuess = it },
+            value = uiState.userGuess,
+            onValueChange = { viewModel.onUserGuessChanged(it) },
             label = { Text("Guess the dog breed") },
             singleLine = true,
-            enabled = !isLoading && currentCard != null // Disable when loading
+            enabled = !uiState.isLoading && uiState.currentCard != null // Disable when loading
         )
 
         Spacer(Modifier.height(16.dp))
 
         // Button to load the next card
         Button(onClick = {
-            scope.launch {
-                if (currentCard is DogFlashCard) {
-                    val card = currentCard as DogFlashCard
-                    if (userGuess.equals(card.name, ignoreCase = true)) {
-                        feedbackMessage = "Correct!"
-                        showAnswer = true
-                        delay(2000) // Wait a second before loading the next card
-                        loadNextCard()
-                    } else {
-                        feedbackMessage = "Try Again!"
-                        delay(1500)
-                        feedbackMessage = null
-                    }
-                }
-            }
+            viewModel.submitGuess()
         },
-            enabled = userGuess.isNotBlank()) {
+            enabled = uiState.userGuess.isNotBlank()) {
             Text("Submit Guess")
         }
     }
